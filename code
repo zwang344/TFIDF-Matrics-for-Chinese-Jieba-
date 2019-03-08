@@ -1,0 +1,44 @@
+#import packages
+import jieba
+import nltk
+import os
+import glob
+import pandas as pd
+import jieba.analyse as analyse
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+#open docs in the folder, convert content into list
+path = ''
+
+reviewlist = []
+for eachfile in glob.glob(os.path.join(path, '*.csv')):
+    f = pd.read_csv(eachfile)
+    f = f['title']
+    
+    content =''
+    for line in f:
+        content = content+line
+    reviewlist.append(content)
+
+#using Jieba to tokenize
+newlist=[]
+for i in reviewlist:
+    word_list = jieba.lcut(i, cut_all=False, HMM=True)
+    word_list = [w for w in word_list if w != ' ' and w.isalpha()]
+    word = ''
+    for i in word_list:
+        word = word+' '+i
+    newlist.append(word)
+
+#calculating tfidf
+tfidf=TfidfVectorizer()           
+trained_tfidf = tfidf.fit_transform(newlist)
+tfidfmatrics = trained_tfidf.toarray()
+
+col_name = tfidf.get_feature_names()
+row_name = ['a','b','c']
+
+tfidftable = pd.DataFrame(tfidfmatrics, index = rowname, columns=vol)
+tfidftable
+
+tfidftable.to_csv('D:\\Tmall review\\tfidftable.csv', encoding='utf-8-sig')
